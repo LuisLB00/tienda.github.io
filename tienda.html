@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner de Código de Barras</title>
+    <style>
+        #video-container {
+            position: relative;
+        }
+        #barcode-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 2px;
+            background-color: red;
+        }
+        #capture-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="barcode-video" width="100%" height="auto" playsinline></video>
+        <div id="barcode-line"></div>
+    </div>
+    <button id="capture-btn" onclick="captureBarcode()">Capturar Código de Barras</button>
+
+    <script>
+        // Acceder a la cámara
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                var video = document.getElementById('barcode-video');
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function (error) {
+                console.error('Error al acceder a la cámara:', error);
+            });
+
+        // Función para capturar el código de barras
+        function captureBarcode() {
+            var video = document.getElementById('barcode-video');
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Aquí puedes usar una librería de escaneo de códigos de barras, como QuaggaJS
+            // o ZXing, para procesar la imagen y obtener el código de barras.
+
+            // Ejemplo con QuaggaJS:
+            Quagga.decodeSingle({
+                src: canvas.toDataURL(),
+                numOfWorkers: 0,  // Desactiva el uso de workers para simplificar el ejemplo
+                inputStream: {
+                    size: canvas.width,
+                    singleChannel: false
+                },
+                decoder: {
+                    readers: ['ean_reader']  // Puedes ajustar los tipos de códigos de barras que deseas leer
+                },
+            }, function(result) {
+                if(result && result.codeResult) {
+                    alert('Código de Barras Capturado: ' + result.codeResult.code);
+                } else {
+                    alert('No se pudo capturar el código de barras.');
+                }
+            });
+        }
+    </script>
+    <script src="https://cdn.rawgit.com/serratus/quaggaJS/gh-pages/dist/quagga.min.js"></script>
+</body>
+</html>
