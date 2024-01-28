@@ -92,7 +92,8 @@
                     console.log('Código de Barras Capturado:', barcodeNumber);
                     alert('Código de Barras Capturado: ' + barcodeNumber);
                 } else {
-                    alert('No se pudo capturar el código de barras.');
+                    console.error('No se pudo capturar el código de barras.');
+                    alert('Error al capturar el código de barras. Intenta de nuevo.');
                 }
             });
         }
