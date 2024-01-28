@@ -32,16 +32,35 @@
     </div>
     <button id="capture-btn" onclick="captureBarcode()">Capturar Código de Barras</button>
 
+    <script src="https://cdn.rawgit.com/serratus/quaggaJS/gh-pages/dist/quagga.min.js"></script>
     <script>
-        // Acceder a la cámara
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (stream) {
-                var video = document.getElementById('barcode-video');
-                video.srcObject = stream;
-                video.play();
+        // Acceder a la cámara trasera
+        navigator.mediaDevices.enumerateDevices()
+            .then(function(devices) {
+                var videoSources = devices.filter(function(device) {
+                    return device.kind === 'videoinput';
+                });
+
+                var rearCamera = videoSources.find(function(source) {
+                    return source.label.toLowerCase().includes('back') || source.label.toLowerCase().includes('rear');
+                });
+
+                if (rearCamera) {
+                    navigator.mediaDevices.getUserMedia({ video: { deviceId: rearCamera.deviceId } })
+                        .then(function (stream) {
+                            var video = document.getElementById('barcode-video');
+                            video.srcObject = stream;
+                            video.play();
+                        })
+                        .catch(function (error) {
+                            console.error('Error al acceder a la cámara:', error);
+                        });
+                } else {
+                    console.error('No se encontró una cámara trasera.');
+                }
             })
             .catch(function (error) {
-                console.error('Error al acceder a la cámara:', error);
+                console.error('Error al enumerar dispositivos:', error);
             });
 
         // Función para capturar el código de barras
@@ -76,6 +95,5 @@
             });
         }
     </script>
-    <script src="https://cdn.rawgit.com/serratus/quaggaJS/gh-pages/dist/quagga.min.js"></script>
 </body>
 </html>
