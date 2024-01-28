@@ -24,8 +24,6 @@
             font-size: 16px;
         }
     </style>
-    <script src="https://cdn.rawgit.com/serratus/quaggaJS/gh-pages/dist/quagga.min.js"></script>
-
 </head>
 <body>
     <div id="video-container">
@@ -73,6 +71,9 @@
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Mostrar la imagen en el documento (opcional, solo para depuración)
+            document.body.appendChild(canvas);
 
             // Aquí puedes usar una librería de escaneo de códigos de barras, como QuaggaJS
             // o ZXing, para procesar la imagen y obtener el código de barras.
