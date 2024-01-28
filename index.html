@@ -75,10 +75,8 @@
             // Mostrar la imagen en el documento (opcional, solo para depuración)
             document.body.appendChild(canvas);
 
-            // Aquí puedes usar QuaggaJS para procesar la imagen y obtener el código de barras.
-            Quagga.decodeSingle({
-                src: canvas.toDataURL(),
-                numOfWorkers: 0,
+            // Configuración de QuaggaJS
+            Quagga.init({
                 inputStream: {
                     size: canvas.width,
                     singleChannel: false
@@ -86,15 +84,36 @@
                 decoder: {
                     readers: ['ean_reader']
                 },
-            }, function(result) {
-                if(result && result.codeResult) {
-                    var barcodeNumber = result.codeResult.code;
-                    console.log('Código de Barras Capturado:', barcodeNumber);
-                    alert('Código de Barras Capturado: ' + barcodeNumber);
-                } else {
+                locate: true,
+                numOfWorkers: 0,
+                frequency: 10,  // Número de intentos por segundo
+                locate: true
+            }, function(err) {
+                if (err) {
+                    console.error('Error al inicializar QuaggaJS:', err);
+                    alert('Error al inicializar QuaggaJS. Intenta de nuevo.');
+                    return;
+                }
+                Quagga.start();
+                // Agregar un temporizador para manejar escaneos que toman demasiado tiempo
+                var timeout = setTimeout(function() {
+                    Quagga.stop();
                     console.error('No se pudo capturar el código de barras.');
                     alert('Error al capturar el código de barras. Intenta de nuevo.');
-                }
+                }, 10000);  // Espera 10 segundos
+                // Registrar un escuchador para manejar el resultado del escaneo
+                Quagga.onDetected(function(result) {
+                    clearTimeout(timeout);  // Limpiar el temporizador
+                    Quagga.stop();
+                    if (result && result.codeResult) {
+                        var barcodeNumber = result.codeResult.code;
+                        console.log('Código de Barras Capturado:', barcodeNumber);
+                        alert('Código de Barras Capturado: ' + barcodeNumber);
+                    } else {
+                        console.error('No se pudo capturar el código de barras.');
+                        alert('Error al capturar el código de barras. Intenta de nuevo.');
+                    }
+                });
             });
         }
     </script>
