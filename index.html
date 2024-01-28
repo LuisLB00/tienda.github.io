@@ -32,7 +32,7 @@
     </div>
     <button id="capture-btn" onclick="captureBarcode()">Capturar Código de Barras</button>
 
-    <script src="https://cdn.rawgit.com/serratus/quaggaJS/gh-pages/dist/quagga.min.js"></script>
+    <script src="quagga.min.js"></script>
     <script>
         // Acceder a la cámara trasera
         navigator.mediaDevices.enumerateDevices()
@@ -75,23 +75,22 @@
             // Mostrar la imagen en el documento (opcional, solo para depuración)
             document.body.appendChild(canvas);
 
-            // Aquí puedes usar una librería de escaneo de códigos de barras, como QuaggaJS
-            // o ZXing, para procesar la imagen y obtener el código de barras.
-
-            // Ejemplo con QuaggaJS:
+            // Aquí puedes usar QuaggaJS para procesar la imagen y obtener el código de barras.
             Quagga.decodeSingle({
                 src: canvas.toDataURL(),
-                numOfWorkers: 0,  // Desactiva el uso de workers para simplificar el ejemplo
+                numOfWorkers: 0,
                 inputStream: {
                     size: canvas.width,
                     singleChannel: false
                 },
                 decoder: {
-                    readers: ['ean_reader']  // Puedes ajustar los tipos de códigos de barras que deseas leer
+                    readers: ['ean_reader']
                 },
             }, function(result) {
                 if(result && result.codeResult) {
-                    alert('Código de Barras Capturado: ' + result.codeResult.code);
+                    var barcodeNumber = result.codeResult.code;
+                    console.log('Código de Barras Capturado:', barcodeNumber);
+                    alert('Código de Barras Capturado: ' + barcodeNumber);
                 } else {
                     alert('No se pudo capturar el código de barras.');
                 }
